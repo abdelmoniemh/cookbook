@@ -250,3 +250,7 @@
 .cook-ing-btn { flex: none; }
 .chip-selects .select select { max-width: 168px; text-overflow: ellipsis; }
 @media (max-width: 899px) { .plan-totals { order: 2; } }
+.shop-progress .shop-done { display: flex; align-items: center; gap: var(--s2); color: var(--success); font-weight: 700; }
+.browse > * { min-width: 0; }
+.state { width: 100%; min-width: 0; }
+.state .code { white-space: pre-wrap; overflow-wrap: anywhere; }

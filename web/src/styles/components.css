@@ -372,7 +372,6 @@ input:focus-visible, textarea:focus-visible, select:focus-visible { outline-offs
 .ing-item, .ing-check { padding: 10px 0; }
 .ing-text { display: block; }
 .ing-amount { font-family: var(--font-num); font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; margin-right: 0.35em; }
-.ing-name { }
 .ing-alt { color: var(--ink-3); }
 .ing-aside { display: block; font-size: var(--text-sm); color: var(--ink-2); }
 .ing-note {

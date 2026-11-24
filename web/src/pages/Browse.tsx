@@ -127,6 +127,7 @@ export function BrowsePage() {
         </div>
       )}
 
+      {!noRecipesAtAll && (<>
       <div className="browse-tools">
         <div className="search">
           <Icon name="search" size={20} />
@@ -159,6 +160,8 @@ export function BrowsePage() {
           </button>
         ))}
       </div>
+
+      </>)}
 
       <div className="browse-status" aria-live="polite">
         {list.data && !noRecipesAtAll && (

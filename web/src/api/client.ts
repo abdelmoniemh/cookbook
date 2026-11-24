@@ -28,7 +28,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       if (typeof body?.detail === 'string') message = body.detail
       else if (Array.isArray(body?.detail)) message = body.detail.map((d: { msg?: string }) => d.msg).join('; ')
     } catch {
-      /* not JSON */
+      // Not JSON: usually a proxy or the server itself being down.
+      if (res.status >= 500) message = `The cookbook server isn't responding (${res.status}). Is it running?`
     }
     throw new ApiError(res.status, message)
   }

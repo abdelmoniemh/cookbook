@@ -20,7 +20,8 @@ body {
 }
 
 h1, h2, h3, h4 { margin: 0; line-height: 1.15; text-wrap: balance; }
-p { margin: 0; }
+p { margin: 0; text-wrap: pretty; }
+li { text-wrap: pretty; }
 ul, ol { margin: 0; padding: 0; list-style: none; }
 img { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; color: inherit; }

@@ -83,7 +83,7 @@ export function ShoppingPage() {
     <div className="shopping">
       <PageHeader
         title="Shopping"
-        sub={data ? <>{relativeWeek(data.week)} {weekLabel(data.week)} · <Link to={planHref}>{data.entries} {data.entries === 1 ? 'recipe' : 'recipes'}</Link></> : null}
+        sub={data ? <>{relativeWeek(data.week)} {weekLabel(data.week)} · {data.entries ? <Link to={planHref}>{data.entries} {data.entries === 1 ? 'recipe' : 'recipes'}</Link> : 'nothing planned'}</> : null}
       />
 
       {state.error ? (
@@ -97,7 +97,11 @@ export function ShoppingPage() {
       ) : (
         <>
           <div className="shop-progress" aria-live="polite">
-            <p><strong>{doneCount}</strong> of {all.length} in the basket</p>
+            {all.length > 0 && doneCount === all.length ? (
+              <p className="shop-done"><Icon name="check" size={18} /> Everything's in the basket. Enjoy the cook.</p>
+            ) : (
+              <p><strong>{doneCount}</strong> of {all.length} in the basket</p>
+            )}
             <div className="shop-meter" aria-hidden="true"><span style={{ width: `${all.length ? (doneCount / all.length) * 100 : 0}%` }} /></div>
           </div>
 
