@@ -1,0 +1,20 @@
+# Recipe content from your own cookbooks never goes in git.
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.pdf
+images/
+import-report*.md
+
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+dist/
+build/
+node_modules/
+web/dist/
+.env
+.DS_Store
