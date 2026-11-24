@@ -56,6 +56,22 @@ class RecipeDraft:
 
 # ---------------------------------------------------------------- shared pieces
 
+def is_component_reference(canonical: str, unit: str | None, own_group: str | None, group_names) -> bool:
+    """True when an ingredient line points at another component of the same recipe, e.g. "1 Serving Taco
+    Spice Mix" next to a "Taco Spice Mix" group. A plain ingredient that merely shares a word with a group
+    ("Chicken Breast" in a "Chicken" group, "Garlic" next to "Garlic Naan") is not a reference."""
+    if not canonical:
+        return False
+    own = canonical_name(own_group) if own_group else None
+    for name in group_names:
+        n = canonical_name(name)
+        if len(n) <= 4 or n == own:
+            continue
+        if canonical == n or (unit == "serving" and (n in canonical or canonical in n)):
+            return True
+    return False
+
+
 def _is_skip(line: Line) -> bool:
     return bool(SKIP_RE.match(line.clean)) or line.y0 > FOOTER_Y or not line.clean
 
@@ -140,15 +156,14 @@ def parse_ingredient_region(lines: list[Line], bullets: list[Bullet], draft: Rec
             buf.append(l)
         flush()
     draft.groups = [g for g in draft.groups if g.items]
-    group_names = {canonical_name(g.name) for g in draft.groups if g.name}
+    group_names = [g.name for g in draft.groups if g.name]
     for g in draft.groups:
         for i in g.items:
             if i.kind != "item":
                 continue
             if not i.item:
                 draft.warnings.append(f"ingredient has no name in the book: {i.raw!r}")
-            # "1 Serving Taco Spice Mix" refers to another component of this recipe, not something to buy
-            if i.canonical and any(i.canonical in n or n in i.canonical for n in group_names if len(n) > 4):
+            if is_component_reference(i.canonical, i.unit, g.name, group_names):
                 i.aisle = "Skip"
 
 

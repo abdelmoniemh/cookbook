@@ -46,7 +46,7 @@ def save_image(doc: pymupdf.Document, xref: int, dest: Path, max_width: int = 14
 def store(conn, source_id: int, src_slug: str, doc: pymupdf.Document, r: RecipeDraft, images_dir: Path,
           meal_prep_book: bool, used_slugs: set[str]) -> str:
     slug = slugify(r.title) or f"recipe-{r.pages[0]}"
-    if slug in used_slugs:  # same title twice (e.g. two "Healthy Pad Thai" pages)
+    if slug in used_slugs:  # the same title can appear twice in one book
         slug = f"{slug}-{src_slug}-p{r.pages[0]}"
     used_slugs.add(slug)
 

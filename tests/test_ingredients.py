@@ -73,3 +73,24 @@ def test_canonical_and_aisle_helpers():
     assert canonical_name("Red or White Onion") == "white onion"
     assert canonical_name("Cherry Tomatoes") == "cherry tomato"
     assert classify_aisle("rice vinegar") == "Sauces & Pantry"
+
+
+def test_prep_after_comma_is_not_an_each_list():
+    i = parse_ingredient("1 Tbsp Garlic, Crushed")
+    assert i.each == [] and i.item == "Garlic" and i.prep == "Crushed"
+    assert parse_ingredient("1 Tsp Salt, Paprika, Cumin").each == ["Salt", "Paprika", "Cumin"]
+
+
+def test_canonical_drops_dangling_or():
+    from cookbook.importer.ingredients import canonical_name
+    assert canonical_name("Shredded/Desiccated Coconut") == "desiccated coconut"
+    assert canonical_name("Fresh or Dried Parsley") == "dried parsley"
+
+
+def test_component_reference_rule():
+    from cookbook.importer.parsers import is_component_reference
+    groups = ["Chicken", "Taco Spice Mix", "Garlic Naan"]
+    assert is_component_reference("taco spice mix", "serving", "Chicken", groups)
+    assert not is_component_reference("chicken breast", "g", "Chicken", groups)
+    assert not is_component_reference("garlic", "tbsp", "Chicken", groups)
+    assert parse_ingredient("200ml Boiling Water").aisle == "Skip"

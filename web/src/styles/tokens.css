@@ -1,0 +1,124 @@
+/* Design tokens. World: competition bumper plates. See DESIGN.md. */
+:root {
+  color-scheme: light dark;
+
+  /* Neutrals: cool chalk ground (light), rubber graphite (dark). */
+  --ground: oklch(96.8% 0.006 255);
+  --surface: oklch(99.6% 0.002 255);
+  --surface-2: oklch(93.6% 0.011 258);
+  --surface-3: oklch(90% 0.014 260);
+  --ink: oklch(21% 0.03 266);
+  --ink-2: oklch(40% 0.03 266);
+  --ink-3: oklch(50% 0.026 266);
+  --line: oklch(87.5% 0.013 262);
+  --line-strong: oklch(78% 0.018 262);
+
+  /* Plate colours. Blue owns the shell and primary actions; red/yellow/green are macro data only. */
+  --blue: oklch(41% 0.165 265);
+  --blue-hover: oklch(36% 0.16 265);
+  --blue-ink: oklch(43% 0.17 265);         /* blue as text/links on the ground */
+  --blue-tint: oklch(92% 0.04 265);
+  --on-blue: oklch(99% 0.005 265);
+  --on-blue-2: oklch(86% 0.04 265);
+  --shell: var(--blue);
+  --shell-line: oklch(50% 0.15 265);
+
+  --protein: oklch(56% 0.205 27);
+  --protein-ink: oklch(50% 0.19 27);
+  --carbs: oklch(84% 0.16 88);
+  --carbs-ink: oklch(50% 0.11 80);
+  --fat: oklch(59% 0.14 152);
+  --fat-ink: oklch(47% 0.12 152);
+  --kcal-ink: var(--blue-ink);
+
+  --danger: oklch(52% 0.19 27);
+  --danger-tint: oklch(94% 0.03 27);
+  --success: oklch(50% 0.13 152);
+
+  --photo-bg: oklch(88% 0.012 262);
+  --scrim: oklch(15% 0.02 265 / 0.55);
+
+  /* Type */
+  --font-ui: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-num: 'Barlow Condensed', 'Barlow', system-ui, sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+
+  /* Space (4px base) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 20px;
+  --s6: 24px;
+  --s8: 32px;
+  --s10: 40px;
+  --s12: 48px;
+  --s16: 64px;
+
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 10px;
+  --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px oklch(20% 0.03 265 / 0.08), 0 2px 6px oklch(20% 0.03 265 / 0.06);
+  --shadow-2: 0 4px 12px oklch(20% 0.03 265 / 0.12), 0 12px 32px oklch(20% 0.03 265 / 0.12);
+
+  --tap: 48px;
+  --tabbar-h: 64px;
+  --topbar-h: 60px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 180ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: oklch(17.5% 0.012 262);
+    --surface: oklch(21.5% 0.014 262);
+    --surface-2: oklch(25.5% 0.016 262);
+    --surface-3: oklch(29% 0.018 262);
+    --ink: oklch(95.5% 0.006 262);
+    --ink-2: oklch(80% 0.014 262);
+    --ink-3: oklch(70% 0.016 262);
+    --line: oklch(31% 0.016 262);
+    --line-strong: oklch(40% 0.02 262);
+
+    --blue: oklch(48% 0.17 265);
+    --blue-hover: oklch(53% 0.17 265);
+    --blue-ink: oklch(76% 0.12 265);
+    --blue-tint: oklch(30% 0.07 265);
+    --shell: oklch(30% 0.11 265);
+    --shell-line: oklch(38% 0.11 265);
+    --on-blue-2: oklch(82% 0.05 265);
+
+    --protein: oklch(64% 0.2 27);
+    --protein-ink: oklch(74% 0.15 27);
+    --carbs: oklch(85% 0.15 88);
+    --carbs-ink: oklch(86% 0.13 88);
+    --fat: oklch(68% 0.14 152);
+    --fat-ink: oklch(78% 0.13 152);
+
+    --danger: oklch(72% 0.16 27);
+    --danger-tint: oklch(28% 0.06 27);
+    --success: oklch(76% 0.13 152);
+
+    --photo-bg: oklch(27% 0.016 262);
+    --scrim: oklch(8% 0.01 265 / 0.65);
+
+    --shadow-1: 0 1px 2px oklch(0% 0 0 / 0.4), 0 2px 6px oklch(0% 0 0 / 0.3);
+    --shadow-2: 0 6px 16px oklch(0% 0 0 / 0.45), 0 16px 40px oklch(0% 0 0 / 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur: 0ms;
+  }
+}

@@ -18,3 +18,8 @@ node_modules/
 web/dist/
 .env
 .DS_Store
+
+# Impeccable runtime folders (they also ignore themselves)
+.impeccable/questions/
+.impeccable/mocks/
+.impeccable/review/

@@ -6,14 +6,21 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
+    "fastapi>=0.165.0",
     "pymupdf>=1.24",
+    "python-multipart>=0.0.34",
+    "uvicorn>=0.54.0",
 ]
 
 [project.scripts]
 cookbook-import = "cookbook.importer.cli:main"
+cookbook-serve = "cookbook.server.app:main"
 
 [dependency-groups]
-dev = ["pytest>=8"]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=8",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -25,3 +32,4 @@ packages = ["src/cookbook"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
