@@ -94,3 +94,18 @@ def test_component_reference_rule():
     assert not is_component_reference("chicken breast", "g", "Chicken", groups)
     assert not is_component_reference("garlic", "tbsp", "Chicken", groups)
     assert parse_ingredient("200ml Boiling Water").aisle == "Skip"
+
+
+@pytest.mark.parametrize("title, category", [
+    ("Butter Chicken Loaded Fries", "Potatoes & fries"),
+    ("Chicken Fajita Mac n Cheese", "Pasta & mac n cheese"),
+    ("Chicken Gyros Bowls", "Rice & bowls"),
+    ("Garlic Parmesan Fries", "Sides"),
+    ("Crispy Potatoes & Scrambled Eggs", "Breakfast"),
+    ("Chicken Tikka Masala & Veggie Garlic Rice", "Curries"),
+    ("Korean BBQ Chicken", "Proteins & mains"),
+    ("Protein Ice Cream", "Desserts & snacks"),
+])
+def test_dish_type(title, category):
+    from cookbook.importer.tags import derive_category
+    assert derive_category(title) == category

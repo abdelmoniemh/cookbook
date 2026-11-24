@@ -40,6 +40,14 @@ type RecipeSummary = {
   tags: string[]
   source: { id: number; name: string } | null   // null = created in the app
   favourite: boolean
+  collection: "meal_prep" | "recipes"           // batch-cook meal preps vs everyday recipes
+  category: string                              // dish type, e.g. "Rice & bowls" (see /api/collections)
+}
+
+type CollectionInfo = {
+  collection: "meal_prep" | "recipes"
+  count: number
+  categories: { category: string; count: number }[]   // display order; empty types omitted
 }
 
 type RecipeDetail = RecipeSummary & {
@@ -60,6 +68,8 @@ type RecipeInput = {          // create / update
   servings?: number | null
   kcal?: number | null; protein?: number | null; carbs?: number | null; fat?: number | null
   tags?: string[]
+  collection?: "meal_prep" | "recipes"   // derived from the title when omitted
+  category?: string                      // derived from the title when omitted
   groups: { name: string | null; note?: string | null; lines: string[] }[]   // raw ingredient lines; the server parses them
   steps: string[]
   notes?: string[]
@@ -98,13 +108,14 @@ type ShoppingList = { plan_id: number; aisles: { aisle: string; items: ShoppingI
 
 | Method | Path | Body / query | Returns |
 | --- | --- | --- | --- |
-| GET | `/api/recipes` | `q` (full-text), `tag` (repeatable, AND), `source` (id), `favourite` (bool), `max_kcal`, `min_protein`, `sort` = `title` \| `protein` \| `kcal` \| `recent` (default `title`), `limit` (default 50), `offset` | `{ items: RecipeSummary[], total: number }` |
+| GET | `/api/recipes` | `q` (full-text), `tag` (repeatable, AND), `source` (id), `collection`, `category`, `favourite` (bool), `max_kcal`, `min_protein`, `sort` = `title` \| `protein` \| `kcal` \| `recent` (default `title`), `limit` (default 50), `offset` | `{ items: RecipeSummary[], total: number }` |
 | GET | `/api/recipes/{id or slug}` | `servings` (optional number; scales ingredients) | `RecipeDetail` |
 | POST | `/api/recipes` | `RecipeInput` | `RecipeDetail` (201) |
 | PUT | `/api/recipes/{id}` | `RecipeInput` | `RecipeDetail` (marks `user_edited`) |
 | DELETE | `/api/recipes/{id}` | | 204 |
 | PUT | `/api/recipes/{id}/favourite` | `{ favourite: boolean }` | `RecipeSummary` |
 | GET | `/api/tags` | | `{ tag: string; count: number }[]` sorted by count |
+| GET | `/api/collections` | | `CollectionInfo[]` (meal prep first) |
 | GET | `/api/sources` | | `{ id, name, recipe_count }[]` |
 | POST | `/api/import` | multipart `file` (PDF) | `{ source: string; added: number; updated: number; kept: number; warnings: { title: string; page: number; warnings: string[] }[] }` |
 | GET | `/api/plans/current` | `week` (ISO date, any day in the week; default today) | `Plan` (created empty if missing) |

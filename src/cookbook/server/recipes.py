@@ -9,11 +9,13 @@ from .. import db as dbmod
 from ..importer.cli import slugify
 from ..importer.ingredients import WATER_RE, classify_aisle, is_prep_word, parse_ingredient
 from ..importer.parsers import is_component_reference
+from ..importer.tags import CATEGORIES, derive_category, derive_collection
 from .units import ingredient_display
 
 SUMMARY_SQL = """
     SELECT r.id, r.slug, r.title, r.blurb, r.image, r.kcal, r.protein, r.carbs, r.fat, r.servings, r.tags,
-           r.favourite, r.source_id, s.name AS source_name
+           r.favourite, r.source_id, s.name AS source_name,
+           r.collection, r.category
     FROM recipes r LEFT JOIN sources s ON s.id = r.source_id
 """
 DETAIL_SQL = SUMMARY_SQL.replace("r.favourite,", "r.favourite, r.servings_text, r.videos, r.source_page, r.user_edited,")
@@ -34,6 +36,8 @@ def summary(row: sqlite3.Row) -> dict:
         "tags": json.loads(row["tags"] or "[]"),
         "source": {"id": row["source_id"], "name": row["source_name"]} if row["source_id"] is not None else None,
         "favourite": bool(row["favourite"]),
+        "collection": row["collection"] or "recipes",
+        "category": row["category"] or "Proteins & mains",
     }
 
 
@@ -146,8 +150,11 @@ def _clean(lines: list[str]) -> list[str]:
 def save(conn: sqlite3.Connection, data, recipe_id: int | None = None) -> int:
     """Create (recipe_id None) or replace a recipe from a RecipeInput. Caller commits."""
     tags = list(dict.fromkeys(t.strip() for t in data.tags if t.strip()))
+    collection = data.collection or derive_collection(data.title, tags, None)
+    category = (data.category or "").strip() or derive_category(data.title, tags)
     values = dict(title=data.title.strip(), blurb=data.blurb, servings=data.servings, kcal=data.kcal,
-                  protein=data.protein, carbs=data.carbs, fat=data.fat, tags=json.dumps(tags))
+                  protein=data.protein, carbs=data.carbs, fat=data.fat, tags=json.dumps(tags),
+                  collection=collection, category=category)
     if recipe_id is None:
         values["slug"] = unique_slug(conn, data.title)
         cols = ", ".join(values)

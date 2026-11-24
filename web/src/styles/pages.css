@@ -254,3 +254,31 @@
 .browse > * { min-width: 0; }
 .state { width: 100%; min-width: 0; }
 .state .code { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* ---------------------------------------------------------------- collection switch + dish-type sections */
+.segmented {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px;
+  background: var(--surface-2); border-radius: var(--radius-lg); margin-bottom: var(--s4);
+}
+@media (min-width: 620px) { .segmented { display: inline-grid; min-width: 360px; } }
+.segmented button {
+  min-height: 44px; border: 0; border-radius: var(--radius); background: none; color: var(--ink-2);
+  font-family: var(--font-num); font-weight: 700; font-size: var(--text-lg); text-transform: uppercase;
+  letter-spacing: 0.03em; display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+}
+.segmented button.is-on { background: var(--shell); color: var(--on-blue); box-shadow: var(--shadow-1); }
+.segmented-count { font-weight: 600; font-size: var(--text-sm); opacity: 0.75; font-variant-numeric: tabular-nums; }
+.chips-types { margin-bottom: var(--s2); }
+.chip-type { text-transform: none; }
+
+.type-section + .type-section { margin-top: var(--s8); }
+.type-head {
+  display: flex; align-items: baseline; gap: var(--s3); margin-bottom: var(--s4);
+  padding-bottom: var(--s2); border-bottom: 2px solid var(--ink);
+}
+.type-head h2 {
+  font-family: var(--font-num); font-weight: 700; font-size: var(--text-2xl); text-transform: uppercase;
+  letter-spacing: 0.02em; line-height: 1;
+}
+.type-count { font-family: var(--font-num); font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.type-all { margin-left: auto; }

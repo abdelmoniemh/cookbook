@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api/client'
-import type { RecipeDetail, RecipeInput } from '../api/types'
+import type { Collection, RecipeDetail, RecipeInput } from '../api/types'
 import { PageHeader } from '../components/AppShell'
 import { Icon } from '../components/Icon'
 import { ErrorState, Spinner } from '../components/States'
@@ -13,11 +13,13 @@ type Form = {
   title: string; blurb: string; servings: string
   kcal: string; protein: string; carbs: string; fat: string
   tags: string[]; groups: Group[]; steps: string[]; notes: string
+  collection: Collection; category: string
 }
 
 const EMPTY: Form = {
   title: '', blurb: '', servings: '4', kcal: '', protein: '', carbs: '', fat: '',
   tags: [], groups: [{ name: '', note: '', text: '' }], steps: [''], notes: '',
+  collection: 'recipes', category: '',
 }
 
 function fromRecipe(r: RecipeDetail): Form {
@@ -29,6 +31,7 @@ function fromRecipe(r: RecipeDetail): Form {
     groups: r.groups.length ? r.groups.map((g) => ({ name: g.name ?? '', note: g.note ?? '', text: g.items.map((i) => i.raw).join('\n') })) : EMPTY.groups,
     steps: r.steps.length ? r.steps : [''],
     notes: r.notes.join('\n'),
+    collection: r.collection, category: r.category,
   }
 }
 
@@ -45,6 +48,8 @@ function toInput(f: Form): RecipeInput {
       .filter((g) => g.lines.length || g.name),
     steps: f.steps.map((s) => s.trim()).filter(Boolean),
     notes: f.notes.split('\n').map((l) => l.trim()).filter(Boolean),
+    collection: f.collection,
+    category: f.category.trim() || undefined,
   }
 }
 
@@ -55,6 +60,8 @@ export function EditorPage() {
   const toast = useToast()
   const existing = useFetch<RecipeDetail | undefined>(() => (slug ? api.recipe(slug) : Promise.resolve(undefined)), slug ?? 'new')
   const tagList = useFetch(() => api.tags(), 'tags')
+  const collections = useFetch(() => api.collections(), 'collections')
+  const categoryOptions = [...new Set((collections.data ?? []).flatMap((c) => c.categories.map((x) => x.category)))]
   const [form, setForm] = useState<Form>(EMPTY)
   const [tagText, setTagText] = useState('')
   const [saving, setSaving] = useState(false)
@@ -137,6 +144,24 @@ export function EditorPage() {
             ))}
           </div>
           <p className="field-help">Macros are per serving.</p>
+
+          <div className="field-row">
+            <div className="field">
+              <label htmlFor="f-collection">Collection</label>
+              <select id="f-collection" value={form.collection} onChange={(e) => set('collection', e.target.value as Collection)}>
+                <option value="meal_prep">Meal prep</option>
+                <option value="recipes">Recipes</option>
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="f-category">Dish type <span className="opt">optional</span></label>
+              <input id="f-category" list="f-category-list" value={form.category} placeholder="Worked out from the title"
+                onChange={(e) => set('category', e.target.value)} autoComplete="off" />
+              <datalist id="f-category-list">
+                {categoryOptions.map((c) => <option key={c} value={c} />)}
+              </datalist>
+            </div>
+          </div>
 
           <div className="field">
             <label htmlFor="f-tags">Tags</label>

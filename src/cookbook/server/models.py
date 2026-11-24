@@ -50,6 +50,8 @@ class RecipeSummary(BaseModel):
     tags: list[str]
     source: SourceRef | None
     favourite: bool
+    collection: Literal["meal_prep", "recipes"]
+    category: str
 
 
 class RecipeDetail(RecipeSummary):
@@ -84,6 +86,8 @@ class RecipeInput(BaseModel):
     carbs: float | None = None
     fat: float | None = None
     tags: list[str] = Field(default_factory=list)
+    collection: Literal["meal_prep", "recipes"] | None = None  # derived from the title when omitted
+    category: str | None = None                                # derived from the title when omitted
     groups: list[GroupInput] = Field(default_factory=list)
     steps: list[str] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
@@ -91,6 +95,17 @@ class RecipeInput(BaseModel):
 
 class FavouriteInput(BaseModel):
     favourite: bool
+
+
+class CategoryCount(BaseModel):
+    category: str
+    count: int
+
+
+class CollectionInfo(BaseModel):
+    collection: Literal["meal_prep", "recipes"]
+    count: int
+    categories: list[CategoryCount]
 
 
 class TagCount(BaseModel):

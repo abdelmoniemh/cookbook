@@ -45,12 +45,26 @@ function ingredientOut(it, scale) {
     display: `${amount ? amount + ' ' : ''}${it.item}${it.prep ? `, ${it.prep}` : ''}`,
   }
 }
+// Mirrors src/cookbook/importer/tags.py closely enough for the mock.
+const CATEGORIES = ['Rice & bowls', 'Pasta & mac n cheese', 'Noodles', 'Potatoes & fries', 'Wraps, tacos & burgers', 'Curries',
+  'Pizza', 'Proteins & mains', 'Breakfast', 'Sides', 'Smoothies & drinks', 'Desserts & snacks']
+const RULES = [
+  ['Smoothies & drinks', /smoothie|shake/], ['Breakfast', /breakfast|pancake|oats|omelette|eggs/],
+  ['Desserts & snacks', /cookie|brownie|ice cream|bars/], ['Pizza', /pizza/],
+  ['Pasta & mac n cheese', /pasta|mac n cheese|alfredo|spaghetti|penne/], ['Noodles', /noodle|chow mein|pad thai/],
+  ['Potatoes & fries', /potato|fries|chips/], ['Rice & bowls', /bowl/], ['Wraps, tacos & burgers', /wrap|burrito|taco|burger|sandwich/],
+  ['Curries', /curry|masala|tikka/], ['Rice & bowls', /rice/],
+]
+const collectionOf = (r) => r.collection ?? (r.tags.includes('meal prep') ? 'meal_prep' : 'recipes')
+const categoryOf = (r) => r.category || (RULES.find(([, re]) => re.test(r.title.toLowerCase())) ?? ['Proteins & mains'])[0]
+
 function summary(r) {
   const src = SOURCES.find((s) => s.id === r.source_id)
   return {
     id: r.id, slug: r.slug, title: r.title, blurb: r.blurb, image_url: r.image_url,
     kcal: r.kcal, protein: r.protein, carbs: r.carbs, fat: r.fat, servings: r.servings,
     tags: r.tags, source: src ? { id: src.id, name: src.name } : null, favourite: r.favourite,
+    collection: collectionOf(r), category: categoryOf(r),
   }
 }
 function detail(r, servings) {
@@ -144,6 +158,8 @@ function applyInput(r, body) {
   r.servings_text = body.servings ? `Serves ${body.servings}` : null
   for (const k of ['kcal', 'protein', 'carbs', 'fat']) r[k] = body[k] ?? null
   r.tags = body.tags ?? []
+  r.collection = body.collection ?? r.collection
+  r.category = body.category ?? r.category
   r.groups = (body.groups ?? []).map((g) => ({ name: g.name, note: g.note ?? null, items: g.lines.filter((l) => l.trim()).map(parseLine) }))
   r.steps = body.steps ?? []
   r.notes = body.notes ?? []
@@ -185,6 +201,14 @@ const server = http.createServer(async (req, res) => {
       for (const r of recipes) for (const t of r.tags) counts.set(t, (counts.get(t) ?? 0) + 1)
       return send(res, 200, [...counts].map(([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count))
     }
+    if (path === '/api/collections') {
+      return send(res, 200, ['meal_prep', 'recipes'].map((collection) => {
+        const mine = recipes.filter((r) => collectionOf(r) === collection)
+        const counts = new Map()
+        for (const r of mine) counts.set(categoryOf(r), (counts.get(categoryOf(r)) ?? 0) + 1)
+        return { collection, count: mine.length, categories: CATEGORIES.filter((c) => counts.has(c)).map((category) => ({ category, count: counts.get(category) })) }
+      }))
+    }
     if (path === '/api/sources') {
       return send(res, 200, SOURCES.map((s) => ({ ...s, recipe_count: recipes.filter((r) => r.source_id === s.id).length })).filter((s) => s.recipe_count))
     }
@@ -203,6 +227,8 @@ const server = http.createServer(async (req, res) => {
         if (text) list = list.filter((r) => [r.title, r.blurb, r.tags.join(' '), ...r.groups.flatMap((g) => g.items.map((i) => i.item || ''))].join(' ').toLowerCase().includes(text))
         for (const t of q.getAll('tag')) list = list.filter((r) => r.tags.includes(t))
         if (q.get('source')) list = list.filter((r) => r.source_id === Number(q.get('source')))
+        if (q.get('collection')) list = list.filter((r) => collectionOf(r) === q.get('collection'))
+        if (q.get('category')) list = list.filter((r) => categoryOf(r) === q.get('category'))
         if (q.get('favourite') === 'true') list = list.filter((r) => r.favourite)
         if (q.get('max_kcal')) list = list.filter((r) => (r.kcal ?? 0) <= Number(q.get('max_kcal')))
         if (q.get('min_protein')) list = list.filter((r) => (r.protein ?? 0) >= Number(q.get('min_protein')))

@@ -143,7 +143,27 @@ def connect(data_dir: Path = DEFAULT_DATA_DIR, check_same_thread: bool = True) -
     conn = open_db(data_dir, check_same_thread)
     conn.execute("PRAGMA journal_mode = WAL")
     conn.executescript(SCHEMA)
+    migrate(conn)
     return conn
+
+
+def migrate(conn: sqlite3.Connection) -> None:
+    """Small in-place upgrades for databases created by older versions."""
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(recipes)")}
+    if "collection" not in cols:
+        conn.execute("ALTER TABLE recipes ADD COLUMN collection TEXT")  # 'meal_prep' | 'recipes'
+    if "category" not in cols:
+        conn.execute("ALTER TABLE recipes ADD COLUMN category TEXT")    # dish type, see importer.tags.CATEGORIES
+    missing = conn.execute("""SELECT r.id, r.title, r.tags, s.name FROM recipes r
+                              LEFT JOIN sources s ON s.id = r.source_id
+                              WHERE r.collection IS NULL OR r.category IS NULL""").fetchall()
+    if missing:
+        from .importer.tags import derive_category, derive_collection
+        conn.executemany(
+            "UPDATE recipes SET collection = coalesce(collection, ?), category = coalesce(category, ?) WHERE id = ?",
+            [(derive_collection(r[1], json.loads(r[2] or "[]"), r[3]), derive_category(r[1], json.loads(r[2] or "[]")),
+              r[0]) for r in missing])
+        conn.commit()
 
 
 def ingredient_text(conn: sqlite3.Connection, recipe_id: int) -> str:
