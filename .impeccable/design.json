@@ -1,0 +1,224 @@
+{
+ "schemaVersion": 2,
+ "generatedAt": "2026-11-24T02:43:13.209125Z",
+ "title": "Design System: Cookbook",
+ "extensions": {
+  "colorMeta": {
+   "plate-blue": {
+    "role": "primary",
+    "displayName": "Plate Blue",
+    "canonical": "oklch(41% 0.165 265)",
+    "tonalRamp": [
+     "oklch(15% 0.057 265)",
+     "oklch(27% 0.091 265)",
+     "oklch(39% 0.125 265)",
+     "oklch(51% 0.159 265)",
+     "oklch(63% 0.147 265)",
+     "oklch(75% 0.113 265)",
+     "oklch(86% 0.082 265)",
+     "oklch(95% 0.057 265)"
+    ]
+   },
+   "protein-red": {
+    "role": "secondary",
+    "displayName": "Protein Red",
+    "canonical": "oklch(56% 0.205 27)",
+    "tonalRamp": [
+     "oklch(15% 0.067 27)",
+     "oklch(27% 0.107 27)",
+     "oklch(39% 0.147 27)",
+     "oklch(51% 0.187 27)",
+     "oklch(63% 0.173 27)",
+     "oklch(75% 0.133 27)",
+     "oklch(86% 0.097 27)",
+     "oklch(95% 0.067 27)"
+    ]
+   },
+   "carbs-yellow": {
+    "role": "secondary",
+    "displayName": "Carbs Yellow",
+    "canonical": "oklch(84% 0.16 88)",
+    "tonalRamp": [
+     "oklch(15% 0.053 88)",
+     "oklch(27% 0.085 88)",
+     "oklch(39% 0.117 88)",
+     "oklch(51% 0.149 88)",
+     "oklch(63% 0.139 88)",
+     "oklch(75% 0.107 88)",
+     "oklch(86% 0.077 88)",
+     "oklch(95% 0.053 88)"
+    ]
+   },
+   "fat-green": {
+    "role": "secondary",
+    "displayName": "Fat Green",
+    "canonical": "oklch(59% 0.14 152)",
+    "tonalRamp": [
+     "oklch(15% 0.047 152)",
+     "oklch(27% 0.075 152)",
+     "oklch(39% 0.103 152)",
+     "oklch(51% 0.131 152)",
+     "oklch(63% 0.121 152)",
+     "oklch(75% 0.093 152)",
+     "oklch(86% 0.068 152)",
+     "oklch(95% 0.047 152)"
+    ]
+   },
+   "chalk-ground": {
+    "role": "neutral",
+    "displayName": "Chalk Ground (dark: Rubber Graphite oklch(17.5% 0.012 262))",
+    "canonical": "oklch(96.8% 0.006 255)",
+    "tonalRamp": [
+     "oklch(15% 0.005 260)",
+     "oklch(27% 0.008 260)",
+     "oklch(39% 0.011 260)",
+     "oklch(51% 0.014 260)",
+     "oklch(63% 0.013 260)",
+     "oklch(75% 0.01 260)",
+     "oklch(86% 0.007 260)",
+     "oklch(95% 0.005 260)"
+    ]
+   }
+  },
+  "typographyMeta": {
+   "display": {
+    "displayName": "Plate lettering",
+    "purpose": "Recipe and page titles, uppercase."
+   },
+   "figure": {
+    "displayName": "Figures",
+    "purpose": "Every decision number: macros, quantities, counts."
+   },
+   "body": {
+    "displayName": "Body",
+    "purpose": "Reading and UI text."
+   }
+  },
+  "shadows": [
+   {
+    "name": "float",
+    "value": "0 1px 2px oklch(20% 0.03 265 / 0.08), 0 2px 6px oklch(20% 0.03 265 / 0.06)",
+    "purpose": "Round buttons over photos."
+   },
+   {
+    "name": "overlay",
+    "value": "0 4px 12px oklch(20% 0.03 265 / 0.12), 0 12px 32px oklch(20% 0.03 265 / 0.12)",
+    "purpose": "Toasts and the cook-mode sheet."
+   }
+  ],
+  "motion": [
+   {
+    "name": "ease-out",
+    "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+    "purpose": "All state transitions, 180ms; 0ms under reduced motion."
+   }
+  ],
+  "breakpoints": [
+   {
+    "name": "grid-3",
+    "value": "620px"
+   },
+   {
+    "name": "shell-desktop",
+    "value": "900px"
+   },
+   {
+    "name": "grid-4",
+    "value": "1100px"
+   },
+   {
+    "name": "grid-5",
+    "value": "1500px"
+   }
+  ]
+ },
+ "components": [
+  {
+   "name": "Primary Button",
+   "kind": "button",
+   "refersTo": "button-primary",
+   "description": "One per view: Start cooking, Shopping list, Save.",
+   "html": "<button class=\"ds-btn-primary\">Start cooking</button>",
+   "css": ".ds-btn-primary{background:var(--blue,oklch(41% 0.165 265));color:var(--on-blue,#fff);border:0;border-radius:6px;min-height:44px;padding:0 16px;font:600 1rem Barlow,system-ui,sans-serif}.ds-btn-primary:hover{background:var(--blue-hover,oklch(36% 0.16 265))}.ds-btn-primary:focus-visible{outline:2.5px solid oklch(43% 0.17 265);outline-offset:2px}"
+  },
+  {
+   "name": "Default Button",
+   "kind": "button",
+   "refersTo": "button-default",
+   "description": "Secondary actions.",
+   "html": "<button class=\"ds-btn\">Add recipes</button>",
+   "css": ".ds-btn{background:oklch(99.6% 0.002 255);color:oklch(21% 0.03 266);border:1px solid oklch(78% 0.018 262);border-radius:6px;min-height:44px;padding:0 16px;font:600 1rem Barlow,system-ui,sans-serif}.ds-btn:hover{background:oklch(93.6% 0.011 258)}.ds-btn:focus-visible{outline:2.5px solid oklch(43% 0.17 265);outline-offset:2px}"
+  },
+  {
+   "name": "Filter Chip",
+   "kind": "chip",
+   "refersTo": "chip",
+   "description": "Tag filters with counts; selected is ink-filled.",
+   "html": "<button class=\"ds-chip\">chicken <span>150</span></button><button class=\"ds-chip ds-on\">meal prep <span>131</span></button>",
+   "css": ".ds-chip{display:inline-flex;gap:6px;align-items:center;min-height:40px;padding:0 12px;border:1px solid oklch(78% 0.018 262);border-radius:999px;background:oklch(99.6% 0.002 255);font:600 .875rem Barlow,sans-serif;text-transform:capitalize;margin-right:8px}.ds-chip span{font-family:'Barlow Condensed',sans-serif;color:oklch(50% 0.026 266)}.ds-on{background:oklch(21% 0.03 266);color:oklch(96.8% 0.006 255)}"
+  },
+  {
+   "name": "Loaded Bar",
+   "kind": "custom",
+   "description": "Signature: calorie split by macro as plates on a bar sleeve.",
+   "html": "<div class=\"ds-bar\"><i class=\"c\"></i><b style=\"flex-grow:.38;background:oklch(56% 0.205 27)\"></b><b style=\"flex-grow:.43;background:oklch(84% 0.16 88)\"></b><b style=\"flex-grow:.19;background:oklch(59% 0.14 152)\"></b><i class=\"c\"></i></div>",
+   "css": ".ds-bar{position:relative;display:flex;gap:2px;align-items:center;height:14px;width:280px}.ds-bar:before{content:'';position:absolute;left:0;right:0;top:6px;height:2px;background:oklch(78% 0.018 262)}.ds-bar b{position:relative;height:100%;flex-basis:0;border-radius:3px}.ds-bar .c{position:relative;width:3px;height:10px;background:oklch(50% 0.026 266);margin:0 3px}.ds-bar .c:first-child{margin-left:8px}.ds-bar .c:last-child{margin-right:8px}"
+  },
+  {
+   "name": "Shopping Row",
+   "kind": "custom",
+   "description": "Whole-row checkbox with condensed amount.",
+   "html": "<button class=\"ds-row\" role=\"checkbox\" aria-checked=\"false\"><span class=\"t\"></span><span class=\"n\">Chicken breast<small>Teriyaki Chicken Noodle Prep</small></span><span class=\"q\">1.7 kg</span></button>",
+   "css": ".ds-row{display:flex;align-items:center;gap:12px;width:340px;min-height:60px;border:0;border-bottom:1px solid oklch(87.5% 0.013 262);background:none;text-align:left;font-family:Barlow,sans-serif}.ds-row .t{width:28px;height:28px;border:2px solid oklch(78% 0.018 262);border-radius:50%}.ds-row .n{flex:1;display:flex;flex-direction:column;font-weight:600;font-size:1.125rem}.ds-row small{font-size:.75rem;font-weight:400;color:oklch(50% 0.026 266)}.ds-row .q{font:700 1.25rem 'Barlow Condensed',sans-serif}"
+  },
+  {
+   "name": "Tab Bar",
+   "kind": "nav",
+   "refersTo": "shell-bar",
+   "description": "Phone navigation in Plate Blue.",
+   "html": "<nav class=\"ds-tabs\"><a class=\"on\">Browse</a><a>Plan</a><a>Shopping</a><a>Add</a></nav>",
+   "css": ".ds-tabs{display:grid;grid-template-columns:repeat(4,1fr);height:64px;width:390px;background:oklch(41% 0.165 265)}.ds-tabs a{display:grid;place-items:center;color:oklch(86% 0.04 265);font:600 .75rem Barlow,sans-serif;border-top:3px solid transparent}.ds-tabs a.on{color:#fff;border-top-color:#fff}"
+  }
+ ],
+ "narrative": {
+  "northStar": "The Loaded Bar",
+  "overview": "A working kitchen-and-store tool dressed in competition bumper plates. Plate blue owns the shell; red, yellow and green are the plates, and they only ever mean protein, carbs and fat. Numbers are set like plate lettering. The food photos carry the browse experience.",
+  "keyCharacteristics": [
+   "Plate-blue shell, chalk ground (light) or rubber graphite (dark).",
+   "Macro colours are data, never decoration.",
+   "Condensed uppercase for titles and section heads; Barlow for everything you read.",
+   "Big targets: 44px minimum, 60px shopping rows, 72px cook-mode buttons.",
+   "Flat surfaces with hairline rules; shadows only on things floating over photos or the page."
+  ],
+  "rules": [
+   {
+    "name": "The Plates Mean Macros Rule",
+    "body": "Red, yellow and green appear only where they encode protein, carbs or fat (plus red on the favourite heart).",
+    "section": "colors"
+   },
+   {
+    "name": "The Blue Shell Rule",
+    "body": "The shell is always Plate Blue, except full-screen cook mode.",
+    "section": "colors"
+   },
+   {
+    "name": "The Lettering Rule",
+    "body": "Any number a user decides with is set in Barlow Condensed with tabular numerals.",
+    "section": "typography"
+   }
+  ],
+  "dos": [
+   "Do put protein first and in Protein Red Ink wherever macros are summarised.",
+   "Do keep every tap target at least 44px; shopping rows at least 60px.",
+   "Do use the authored icon set in web/src/components/Icon.tsx.",
+   "Do let recipe photos run edge to edge on phone and keep text off them.",
+   "Do respect prefers-reduced-motion and both colour schemes via the tokens."
+  ],
+  "donts": [
+   "Don't use red, yellow or green for anything other than protein, carbs and fat (and the favourite heart).",
+   "Don't put macro numbers in the body face or proportional numerals.",
+   "Don't add drop shadows to flat panels or cards; depth is tonal.",
+   "Don't load fonts or scripts from a CDN; the app runs offline on the tailnet."
+  ]
+ }
+}
