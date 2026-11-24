@@ -93,16 +93,72 @@ CREATE TABLE IF NOT EXISTS notes (
 CREATE VIRTUAL TABLE IF NOT EXISTS recipe_search USING fts5(
     title, blurb, ingredients, tags, tokenize='porter unicode61'
 );
+
+-- Meal planning and shopping (written by the web app)
+CREATE TABLE IF NOT EXISTS meal_plans (
+    id         INTEGER PRIMARY KEY,
+    week_start TEXT NOT NULL UNIQUE,   -- ISO date of the Monday
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS plan_entries (
+    id        INTEGER PRIMARY KEY,
+    plan_id   INTEGER NOT NULL REFERENCES meal_plans(id) ON DELETE CASCADE,
+    recipe_id INTEGER NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+    servings  REAL NOT NULL,
+    day       TEXT,                    -- mon..sun, NULL = any day this week
+    position  INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS plan_entries_plan ON plan_entries(plan_id);
+
+CREATE TABLE IF NOT EXISTS shopping_checks (
+    plan_id INTEGER NOT NULL REFERENCES meal_plans(id) ON DELETE CASCADE,
+    key     TEXT NOT NULL,             -- ShoppingItem.key: canonical|family
+    checked INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (plan_id, key)
+);
+
+CREATE TABLE IF NOT EXISTS shopping_extras (
+    id      INTEGER PRIMARY KEY,
+    plan_id INTEGER NOT NULL REFERENCES meal_plans(id) ON DELETE CASCADE,
+    text    TEXT NOT NULL,
+    checked INTEGER NOT NULL DEFAULT 0
+);
 """
 
 
-def connect(data_dir: Path = DEFAULT_DATA_DIR) -> sqlite3.Connection:
+def open_db(data_dir: Path, check_same_thread: bool = True) -> sqlite3.Connection:
+    """Open an existing database without running the schema (cheap; used per web request)."""
+    conn = sqlite3.connect(Path(data_dir) / "cookbook.db", check_same_thread=check_same_thread, timeout=10)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+def connect(data_dir: Path = DEFAULT_DATA_DIR, check_same_thread: bool = True) -> sqlite3.Connection:
+    """Open the database, creating the data folder and any missing tables."""
+    data_dir = Path(data_dir)
     data_dir.mkdir(parents=True, exist_ok=True)
     (data_dir / "images").mkdir(exist_ok=True)
-    conn = sqlite3.connect(data_dir / "cookbook.db")
-    conn.row_factory = sqlite3.Row
+    conn = open_db(data_dir, check_same_thread)
+    conn.execute("PRAGMA journal_mode = WAL")
     conn.executescript(SCHEMA)
     return conn
+
+
+def ingredient_text(conn: sqlite3.Connection, recipe_id: int) -> str:
+    rows = conn.execute("SELECT item FROM ingredients WHERE recipe_id = ? AND kind = 'item' ORDER BY id",
+                        (recipe_id,)).fetchall()
+    return " ".join(r[0] or "" for r in rows)
+
+
+def index_recipe(conn: sqlite3.Connection, recipe_id: int) -> None:
+    """Refresh one recipe's row in the full-text index (or drop it if the recipe is gone)."""
+    conn.execute("DELETE FROM recipe_search WHERE rowid = ?", (recipe_id,))
+    r = conn.execute("SELECT title, coalesce(blurb, ''), tags FROM recipes WHERE id = ?", (recipe_id,)).fetchone()
+    if r:
+        conn.execute("INSERT INTO recipe_search(rowid, title, blurb, ingredients, tags) VALUES (?, ?, ?, ?, ?)",
+                     (recipe_id, r[0], r[1], ingredient_text(conn, recipe_id), " ".join(json.loads(r[2]))))
 
 
 def reindex_search(conn: sqlite3.Connection) -> None:

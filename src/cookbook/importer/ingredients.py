@@ -100,6 +100,13 @@ NOTE_RE = re.compile(r"^(note:|season|add |blend|use |distribute|serve|you |mix 
                      r"roughly|optional:|extra seasoning|then |evenly |or serve|to serve|for serving)", re.I)
 GARNISH_RE = re.compile(r"^(garnish|top|topped)( with)?\s+", re.I)
 SPICE_UNITS = {"tsp", "tbsp", "pinch"}
+WATER_RE = re.compile(r"(boiled |boiling |cold |warm |hot |pasta |of )?water|ice( cube)?|ice water")
+# "Garlic, Crushed" is an item plus prep, not "1 Tbsp each Garlic, Crushed"
+PREP_WORD_RE = re.compile(r"(?i)^(\w+ed|finely\b.*|roughly\b.*|freshly\b.*|to taste|optional|for \w+.*)$")
+
+
+def is_prep_word(text: str) -> bool:
+    return bool(PREP_WORD_RE.match(text.strip()))
 
 
 def parse_ingredient(raw: str) -> Ingredient:
@@ -163,7 +170,8 @@ def parse_ingredient(raw: str) -> Ingredient:
     if "," in rest:
         head_, prep = rest.split(",", 1)
         parts = [p.strip() for p in prep.split(",") if p.strip()]
-        if ing.unit in SPICE_UNITS and parts and all(p[:1].isupper() for p in parts):
+        if ing.unit in SPICE_UNITS and parts and all(p[:1].isupper() for p in parts) \
+                and not any(is_prep_word(p) for p in parts):
             # "1 Tsp Salt, Paprika, Cumin" -> 1 tsp each
             ing.each = [head_.strip()] + parts
             rest = head_
@@ -177,7 +185,7 @@ def parse_ingredient(raw: str) -> Ingredient:
     ing.item = rest
     ing.canonical = canonical_name(ing.each[0] if ing.each else rest)
     ing.aisle = classify_aisle(ing.canonical)
-    if re.fullmatch(r"(boiled |cold |warm |hot |pasta |of )?water|ice( cube)?|ice water", ing.canonical):
+    if WATER_RE.fullmatch(ing.canonical):
         ing.aisle = "Skip"  # never goes on the shopping list
     ing.parsed = bool(ing.item) and (ing.qty is not None or ing.unit is not None)
     return ing
@@ -195,6 +203,7 @@ def canonical_name(item: str) -> str:
     s = unicodedata.normalize("NFKD", item.lower()).encode("ascii", "ignore").decode()
     s = re.sub(_STRIP_WORDS, " ", s)
     s = re.sub(r"\s*/\s*", " or ", s)
+    s = re.sub(r"^\s*or\b", " ", s)  # "Shredded/Desiccated Coconut" after stripping "shredded"
     alts = [a.strip() for a in re.split(r"\bor\b", s) if a.strip()]
     if len(alts) > 1:
         # "red or white onion" -> "white onion"; "honey or sugar free syrup" -> "honey"
