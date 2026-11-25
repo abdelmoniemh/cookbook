@@ -1,6 +1,6 @@
 // Small fetch client for the cookbook API (docs/API.md).
 import type {
-  Day, ImportResult, Plan, RecipeDetail, RecipeInput, RecipeList, RecipeQuery, RecipeSummary,
+  CollectionInfo, Day, ImportResult, Plan, RecipeDetail, RecipeInput, RecipeList, RecipeQuery, RecipeSummary,
   ShoppingList, SourceCount, TagCount,
 } from './types'
 
@@ -64,6 +64,7 @@ export const api = {
 
   tags: () => request<TagCount[]>('/api/tags'),
   sources: () => request<SourceCount[]>('/api/sources'),
+  collections: () => request<CollectionInfo[]>('/api/collections'),
 
   /** Uploads a PDF. Uses XHR so the page can show upload progress; `onProgress` gets 0..1. */
   importPdf: (file: File, onProgress?: (fraction: number) => void, signal?: AbortSignal) =>

@@ -13,7 +13,7 @@ import pymupdf
 
 from .. import db as dbmod
 from .parsers import PARSERS, RecipeDraft, parse_document
-from .tags import derive_tags
+from .tags import derive_category, derive_collection, derive_tags
 
 
 def slugify(text: str) -> str:
@@ -44,7 +44,7 @@ def save_image(doc: pymupdf.Document, xref: int, dest: Path, max_width: int = 14
 
 
 def store(conn, source_id: int, src_slug: str, doc: pymupdf.Document, r: RecipeDraft, images_dir: Path,
-          meal_prep_book: bool, used_slugs: set[str]) -> str:
+          meal_prep_book: bool, used_slugs: set[str], source_name: str = "") -> str:
     slug = slugify(r.title) or f"recipe-{r.pages[0]}"
     if slug in used_slugs:  # the same title can appear twice in one book
         slug = f"{slug}-{src_slug}-p{r.pages[0]}"
@@ -65,7 +65,8 @@ def store(conn, source_id: int, src_slug: str, doc: pymupdf.Document, r: RecipeD
     values = dict(source_id=source_id, source_page=r.pages[0], source_number=r.number, slug=slug, title=r.title,
                   blurb=r.blurb, servings=r.servings, servings_text=r.servings_text, kcal=r.kcal,
                   protein=r.protein, carbs=r.carbs, fat=r.fat, tags=json.dumps(tags),
-                  videos=json.dumps(r.videos), image=image_name, warnings=json.dumps(r.warnings))
+                  videos=json.dumps(r.videos), image=image_name, warnings=json.dumps(r.warnings),
+                  collection=derive_collection(r.title, tags, source_name), category=derive_category(r.title, tags))
     if existing:
         rid = existing["id"]
         sets = ", ".join(f"{k} = :{k}" for k in values)
@@ -111,7 +112,7 @@ def import_pdf(conn, path: Path, data_dir: Path, name: str | None, layout: str |
     src_slug = slugify(name)[:12]
     results = []
     for r in drafts:
-        results.append((r, store(conn, source_id, src_slug, doc, r, data_dir / "images", "meal prep" in name.lower(), used)))
+        results.append((r, store(conn, source_id, src_slug, doc, r, data_dir / "images", "meal prep" in name.lower(), used, name)))
     layouts = sorted({"two_page" if len(r.pages) == 2 else "single_page" for r in drafts})
     conn.execute("UPDATE sources SET layout = ? WHERE id = ?", (",".join(layouts), source_id))
     return results

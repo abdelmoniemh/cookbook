@@ -45,6 +45,16 @@ export type RecipeSummary = {
   tags: string[]
   source: Source | null
   favourite: boolean
+  collection: Collection
+  category: string
+}
+
+export type Collection = 'meal_prep' | 'recipes'
+
+export type CollectionInfo = {
+  collection: Collection
+  count: number
+  categories: { category: string; count: number }[]
 }
 
 export type Videos = { youtube?: string; tiktok?: string; instagram?: string }
@@ -70,6 +80,8 @@ export type RecipeInput = {
   carbs?: number | null
   fat?: number | null
   tags?: string[]
+  collection?: Collection
+  category?: string
   groups: { name: string | null; note?: string | null; lines: string[] }[]
   steps: string[]
   notes?: string[]
@@ -123,6 +135,8 @@ export type RecipeQuery = {
   q?: string
   tag?: string[]
   source?: number
+  collection?: Collection
+  category?: string
   favourite?: boolean
   max_kcal?: number
   min_protein?: number

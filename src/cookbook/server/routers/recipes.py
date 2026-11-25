@@ -24,6 +24,8 @@ def list_recipes(
     q: str | None = None,
     tag: list[str] = Query(default=[]),
     source: int | None = None,
+    collection: Literal["meal_prep", "recipes"] | None = None,
+    category: str | None = None,
     favourite: bool | None = None,
     max_kcal: float | None = None,
     min_protein: float | None = None,
@@ -44,6 +46,12 @@ def list_recipes(
     if source is not None:
         where.append("r.source_id = ?")
         params.append(source)
+    if collection is not None:
+        where.append("r.collection = ?")
+        params.append(collection)
+    if category:
+        where.append("r.category = ?")
+        params.append(category)
     if favourite is not None:
         where.append("r.favourite = ?")
         params.append(int(favourite))

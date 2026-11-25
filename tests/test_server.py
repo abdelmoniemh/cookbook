@@ -363,3 +363,37 @@ def test_import_upload(client, data_dir, tmp_path):
     again = client.post("/api/import", files={"file": ("Upload Test.pdf", pdf.read_bytes(), "application/pdf")}).json()
     assert again["updated"] == 1
     assert client.post("/api/import", files={"file": ("x.pdf", b"not a pdf", "application/pdf")}).status_code == 400
+
+
+# ---------------------------------------------------------------- collections and dish types
+
+def test_collection_and_category_are_derived_and_filterable(client):
+    a = make(client, title="Garlic Chicken Rice Bowls Meal Prep")
+    b = make(client, title="Spicy Test Wraps")
+    c = make(client, title="Berry Protein Smoothie")
+    d = make(client, title="Test Noodles", collection="meal_prep", category="Noodles")
+    assert (a["collection"], a["category"]) == ("meal_prep", "Rice & bowls")
+    assert (b["collection"], b["category"]) == ("recipes", "Wraps, tacos & burgers")
+    assert (c["collection"], c["category"]) == ("recipes", "Smoothies & drinks")
+    assert (d["collection"], d["category"]) == ("meal_prep", "Noodles")
+
+    mp = client.get("/api/recipes", params={"collection": "meal_prep"}).json()
+    assert {r["title"] for r in mp["items"]} == {a["title"], d["title"]}
+    wraps = client.get("/api/recipes", params={"collection": "recipes", "category": "Wraps, tacos & burgers"}).json()
+    assert [r["id"] for r in wraps["items"]] == [b["id"]]
+
+    cols = {c["collection"]: c for c in client.get("/api/collections").json()}
+    assert cols["meal_prep"]["count"] == 2
+    # dish types come back in display order, not alphabetically
+    assert [x["category"] for x in cols["meal_prep"]["categories"]] == ["Rice & bowls", "Noodles"]
+    assert cols["recipes"]["count"] == 2
+
+
+def test_old_databases_are_backfilled(data_dir, tmp_path):
+    conn = dbmod.connect(data_dir)
+    conn.execute("INSERT INTO recipes (slug, title, tags) VALUES ('x', 'Creamy Test Pasta', '[]')")
+    conn.execute("UPDATE recipes SET collection = NULL, category = NULL")
+    conn.commit()
+    conn.close()
+    conn = dbmod.connect(data_dir)
+    assert tuple(conn.execute("SELECT collection, category FROM recipes").fetchone()) == ("recipes", "Pasta & mac n cheese")
